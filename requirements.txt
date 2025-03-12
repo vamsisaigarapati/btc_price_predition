@@ -1,0 +1,14 @@
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+statsmodels
+xgboost
+tensorflow-macos
+torch
+transformers
+nltk
+vaderSentiment
+yfinance
+tweepy
