@@ -5,10 +5,13 @@ seaborn
 scikit-learn
 statsmodels
 xgboost
-tensorflow-macos
+tensorflow-macos==2.16.2
 torch
 transformers
 nltk
 vaderSentiment
 yfinance
 tweepy
+kagglehub
+pyarrow
+tf-keras --no-deps
