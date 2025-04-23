@@ -1,5 +1,6 @@
 import os
 import mlflow
+import mlflow.sklearn
 
 # Set up MLflow tracking URI and authentication for DagsHub
 MLFLOW_TRACKING_URI = "https://dagshub.com/vamsisaigarapati/bitcoin_price_pred_CSE574.mlflow"
@@ -10,66 +11,36 @@ os.environ['MLFLOW_TRACKING_PASSWORD'] = '0d66986d30f48a915d60b73c435bdae6ee103e
 mlflow.set_tracking_uri(uri=MLFLOW_TRACKING_URI)
 mlflow.set_experiment("Bitcoin_Price_Prediction_CSE574")
 
-def log_experiment(model_name, params, metrics):
+def log_experiment(model_name, params, metrics, model_object=None):
     """
-    Logs model parameters and evaluation metrics to MLflow (DagsHub).
-    Dynamically adds new parameters or metrics if they were not previously logged.
+    Logs model, parameters, and evaluation metrics to MLflow (DagsHub).
+    Model logging is optional.
     
     :param model_name: (str) Name of the model (e.g., "ARIMA", "XGBoost", "LSTM").
     :param params: (dict) Hyperparameters used for the model.
     :param metrics: (dict) Performance metrics (e.g., RMSE, MAPE).
+    :param model_object: (optional) Trained model object to be saved (e.g., sklearn, SARIMA, etc.)
     """
+    with mlflow.start_run() as run:
+        run_id = run.info.run_id
 
-    # Start a new MLflow run
-    with mlflow.start_run():
-        # Fetch previous runs to check existing parameters
-        previous_runs = mlflow.search_runs(order_by=["start_time DESC"])
-        
-        # Check if there were any previous runs for this model
-        if not previous_runs.empty:
-            last_run_id = previous_runs.iloc[0]["run_id"]
-            last_run_data = mlflow.get_run(last_run_id).data
+        # 1. Save the model only if provided
+        if model_object is not None:
+            mlflow.sklearn.log_model(
+                sk_model=model_object,
+                artifact_path="model",
+                registered_model_name=f"{model_name}_Model"
+            )
 
-            # Retrieve existing parameters and metrics
-            existing_params = last_run_data.params
-            existing_metrics = last_run_data.metrics
-        else:
-            existing_params = {}
-            existing_metrics = {}
-
-        # Log only new parameters (skip already logged ones)
+        # 2. Log parameters
         for param_name, param_value in params.items():
-            if param_name not in existing_params:
-                mlflow.log_param(param_name, param_value)
+            mlflow.log_param(param_name, param_value)
 
-        # Set experiment run name dynamically based on model
-        mlflow.set_tag("mlflow.runName", f"{model_name}-Baseline")
-
-        # Log new metrics (skip already logged ones)
+        # 3. Log metrics
         for metric_name, metric_value in metrics.items():
-            if metric_name not in existing_metrics:
-                mlflow.log_metric(metric_name, metric_value)
-        print('jai_balayya')
+            mlflow.log_metric(metric_name, metric_value)
 
-        print(f"✅ {model_name} metrics logged successfully to DagsHub MLflow.")
+        # 4. Set a tag for better tracking
+        mlflow.set_tag("mlflow.runName", f"{model_name}")
 
-# def log_experiment(model_name, params, metrics):
-#     """
-#     Logs model parameters and evaluation metrics to MLflow (DagsHub).
-    
-#     :param model_name: (str) Name of the model (e.g., "ARIMA", "XGBoost", "LSTM").
-#     :param params: (dict) Hyperparameters used for the model.
-#     :param metrics: (dict) Performance metrics (e.g., RMSE, MAPE).
-#     """
-#     with mlflow.start_run():
-#         # Log hyperparameters
-#         mlflow.log_params(params)
-        
-#         # Set experiment run name dynamically based on model
-#         mlflow.set_tag("mlflow.runName", f"{model_name}-Baseline")
-
-#         # Log evaluation metrics
-#         for metric_name, metric_value in metrics.items():
-#             mlflow.log_metric(metric_name, metric_value)
-
-#         print(f"✅ {model_name} metrics logged successfully to DagsHub MLflow.")
+        print(f"✅ {model_name} logged successfully to DagsHub MLflow.")

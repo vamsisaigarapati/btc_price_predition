@@ -1,19 +1,25 @@
+# Core
 pandas
 numpy
 matplotlib
 seaborn
 scikit-learn
 statsmodels
-xgboost
-tensorflow-macos==2.16.2
-torch
+xgboost            # 2.1.0+ has Apple‑Silicon wheels
+tensorflow-macos   # installs Metal‑accelerated TF on M‑series
+torch==2.2.*       # official wheel for macOS arm64 & Intel
+# For LSTM / sentiment
 transformers
 nltk
 vaderSentiment
+# Data sources & helpers
 yfinance
 tweepy
 kagglehub
-pyarrow
-tf-keras --no-deps
+pyarrow            # needed for parquet read/write
+tf-keras           # keras 2.19 standalone (if you use tf.keras skip this)
 pmdarima
 mlflow
+einops
+tqdm
+pytorch-lightning
