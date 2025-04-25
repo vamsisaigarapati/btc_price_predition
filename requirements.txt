@@ -7,7 +7,7 @@ scikit-learn
 statsmodels
 xgboost            # 2.1.0+ has Apple‑Silicon wheels
 tensorflow-macos   # installs Metal‑accelerated TF on M‑series
-torch==2.2.*       # official wheel for macOS arm64 & Intel
+torch==2.7.0      # official wheel for macOS arm64 & Intel
 # For LSTM / sentiment
 transformers
 nltk
@@ -23,3 +23,6 @@ mlflow
 einops
 tqdm
 pytorch-lightning
+neuralforecast
+numba
+ipywidgets
